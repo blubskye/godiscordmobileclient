@@ -18,10 +18,14 @@
 package storage
 
 import (
-	"encoding/json"
+	"context"
+	"database/sql"
 	"os"
 	"path/filepath"
 	"runtime"
+	"time"
+
+	_ "modernc.org/sqlite"
 )
 
 // CacheLimitMode defines how cache limits are managed
@@ -164,49 +168,219 @@ func HighPerformanceConfig() *Config {
 	return cfg
 }
 
-// Save saves the config to a file
+// Save saves the config to the SQLite database
+// This method opens a temporary connection to save settings
+// For better performance, use Database.SaveConfig when you have an open database
 func (c *Config) Save() error {
 	if err := os.MkdirAll(c.DataDir, 0755); err != nil {
 		return err
 	}
 
-	path := filepath.Join(c.DataDir, "config.json")
-	data, err := json.MarshalIndent(c, "", "  ")
+	dbPath := filepath.Join(c.DataDir, "discord.db")
+	db, err := sql.Open("sqlite", dbPath+"?_pragma=journal_mode(WAL)&_pragma=synchronous(NORMAL)")
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	// Ensure settings table exists
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS app_settings (
+			key TEXT PRIMARY KEY,
+			value TEXT NOT NULL,
+			value_type TEXT NOT NULL,
+			updated_at INTEGER NOT NULL
+		)
+	`)
 	if err != nil {
 		return err
 	}
 
-	return os.WriteFile(path, data, 0644)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Save each setting in a transaction
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.PrepareContext(ctx, `
+		INSERT OR REPLACE INTO app_settings (key, value, value_type, updated_at)
+		VALUES (?, ?, ?, ?)
+	`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	now := time.Now().Unix()
+
+	// Helper to save a setting
+	saveSetting := func(key string, value interface{}, valueType string) error {
+		_, err := stmt.ExecContext(ctx, key, value, valueType, now)
+		return err
+	}
+
+	// Save all settings
+	if err := saveSetting("cache_mode", int(c.Mode), "int"); err != nil {
+		return err
+	}
+	if err := saveSetting("memory_messages_per_channel", c.MemoryMessagesPerChannel, "int"); err != nil {
+		return err
+	}
+	if err := saveSetting("memory_guilds_max", c.MemoryGuildsMax, "int"); err != nil {
+		return err
+	}
+	if err := saveSetting("memory_presences_max", c.MemoryPresencesMax, "int"); err != nil {
+		return err
+	}
+	if err := saveSetting("database_max_size_mb", c.DatabaseMaxSizeMB, "int"); err != nil {
+		return err
+	}
+	if err := saveSetting("database_messages_max", c.DatabaseMessagesMax, "int"); err != nil {
+		return err
+	}
+	if err := saveSetting("database_attachments_max", c.DatabaseAttachmentsMax, "int"); err != nil {
+		return err
+	}
+	if err := saveSetting("auto_reserve_storage_mb", c.AutoReserveStorageMB, "int"); err != nil {
+		return err
+	}
+	if err := saveSetting("auto_max_storage_percent", c.AutoMaxStoragePercent, "float"); err != nil {
+		return err
+	}
+	if err := saveSetting("cleanup_interval_minutes", c.CleanupIntervalMinutes, "int"); err != nil {
+		return err
+	}
+	boolVal := func(b bool) int {
+		if b {
+			return 1
+		}
+		return 0
+	}
+	if err := saveSetting("cleanup_on_low_memory", boolVal(c.CleanupOnLowMemory), "bool"); err != nil {
+		return err
+	}
+	if err := saveSetting("vacuum_on_cleanup", boolVal(c.VacuumOnCleanup), "bool"); err != nil {
+		return err
+	}
+	if err := saveSetting("debug_enabled", boolVal(c.DebugEnabled), "bool"); err != nil {
+		return err
+	}
+	if err := saveSetting("debug_level", int(c.DebugLevel), "int"); err != nil {
+		return err
+	}
+	if err := saveSetting("debug_stack_traces", boolVal(c.DebugStackTraces), "bool"); err != nil {
+		return err
+	}
+	if err := saveSetting("debug_log_to_file", boolVal(c.DebugLogToFile), "bool"); err != nil {
+		return err
+	}
+	if err := saveSetting("debug_log_file", c.DebugLogFile, "string"); err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
-// Load loads config from file, or returns defaults if not found
+// LoadConfig loads config from SQLite database, or returns defaults if not found
 func LoadConfig(dataDir string) (*Config, error) {
 	if dataDir == "" {
 		dataDir = defaultDataDir()
 	}
 
-	path := filepath.Join(dataDir, "config.json")
-	data, err := os.ReadFile(path)
+	cfg := DefaultConfig()
+	cfg.DataDir = dataDir
+
+	// Ensure directory exists
+	if err := os.MkdirAll(dataDir, 0755); err != nil {
+		return cfg, nil // Return defaults on error
+	}
+
+	dbPath := filepath.Join(dataDir, "discord.db")
+
+	// Check if database exists
+	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
+		return cfg, nil // Return defaults, will be created on first save
+	}
+
+	db, err := sql.Open("sqlite", dbPath+"?_pragma=journal_mode(WAL)&_pragma=synchronous(NORMAL)")
 	if err != nil {
-		if os.IsNotExist(err) {
-			cfg := DefaultConfig()
-			cfg.DataDir = dataDir
-			return cfg, nil
+		return cfg, nil // Return defaults on error
+	}
+	defer db.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Helper to get settings
+	getInt := func(key string, def int) int {
+		var value int
+		err := db.QueryRowContext(ctx, "SELECT value FROM app_settings WHERE key = ?", key).Scan(&value)
+		if err != nil {
+			return def
 		}
-		return nil, err
+		return value
 	}
 
-	var cfg Config
-	if err := json.Unmarshal(data, &cfg); err != nil {
-		return nil, err
+	getInt64 := func(key string, def int64) int64 {
+		var value int64
+		err := db.QueryRowContext(ctx, "SELECT value FROM app_settings WHERE key = ?", key).Scan(&value)
+		if err != nil {
+			return def
+		}
+		return value
 	}
 
-	// Ensure data dir is set
-	if cfg.DataDir == "" {
-		cfg.DataDir = dataDir
+	getFloat := func(key string, def float64) float64 {
+		var value float64
+		err := db.QueryRowContext(ctx, "SELECT value FROM app_settings WHERE key = ?", key).Scan(&value)
+		if err != nil {
+			return def
+		}
+		return value
 	}
 
-	return &cfg, nil
+	getBool := func(key string, def bool) bool {
+		var value int
+		err := db.QueryRowContext(ctx, "SELECT value FROM app_settings WHERE key = ?", key).Scan(&value)
+		if err != nil {
+			return def
+		}
+		return value == 1
+	}
+
+	getString := func(key string, def string) string {
+		var value string
+		err := db.QueryRowContext(ctx, "SELECT value FROM app_settings WHERE key = ?", key).Scan(&value)
+		if err != nil {
+			return def
+		}
+		return value
+	}
+
+	// Load all settings
+	cfg.Mode = CacheLimitMode(getInt("cache_mode", int(cfg.Mode)))
+	cfg.MemoryMessagesPerChannel = getInt("memory_messages_per_channel", cfg.MemoryMessagesPerChannel)
+	cfg.MemoryGuildsMax = getInt("memory_guilds_max", cfg.MemoryGuildsMax)
+	cfg.MemoryPresencesMax = getInt("memory_presences_max", cfg.MemoryPresencesMax)
+	cfg.DatabaseMaxSizeMB = getInt64("database_max_size_mb", cfg.DatabaseMaxSizeMB)
+	cfg.DatabaseMessagesMax = getInt("database_messages_max", cfg.DatabaseMessagesMax)
+	cfg.DatabaseAttachmentsMax = getInt("database_attachments_max", cfg.DatabaseAttachmentsMax)
+	cfg.AutoReserveStorageMB = getInt64("auto_reserve_storage_mb", cfg.AutoReserveStorageMB)
+	cfg.AutoMaxStoragePercent = getFloat("auto_max_storage_percent", cfg.AutoMaxStoragePercent)
+	cfg.CleanupIntervalMinutes = getInt("cleanup_interval_minutes", cfg.CleanupIntervalMinutes)
+	cfg.CleanupOnLowMemory = getBool("cleanup_on_low_memory", cfg.CleanupOnLowMemory)
+	cfg.VacuumOnCleanup = getBool("vacuum_on_cleanup", cfg.VacuumOnCleanup)
+	cfg.DebugEnabled = getBool("debug_enabled", cfg.DebugEnabled)
+	cfg.DebugLevel = DebugLevel(getInt("debug_level", int(cfg.DebugLevel)))
+	cfg.DebugStackTraces = getBool("debug_stack_traces", cfg.DebugStackTraces)
+	cfg.DebugLogToFile = getBool("debug_log_to_file", cfg.DebugLogToFile)
+	cfg.DebugLogFile = getString("debug_log_file", cfg.DebugLogFile)
+
+	return cfg, nil
 }
 
 // CalculateAutoLimits adjusts limits based on available storage

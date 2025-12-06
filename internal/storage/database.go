@@ -226,10 +226,215 @@ func (d *Database) migrate() error {
 		INSERT INTO messages_fts(messages_fts, rowid, content) VALUES('delete', old.rowid, old.content);
 		INSERT INTO messages_fts(rowid, content) VALUES (new.rowid, new.content);
 	END;
+
+	-- App settings (key-value store with type safety)
+	CREATE TABLE IF NOT EXISTS app_settings (
+		key TEXT PRIMARY KEY,
+		value TEXT NOT NULL,
+		value_type TEXT NOT NULL,  -- 'int', 'float', 'bool', 'string'
+		updated_at INTEGER NOT NULL
+	);
 	`
 
 	_, err := d.db.Exec(schema)
 	return err
+}
+
+// SaveSetting saves a setting to the database
+func (d *Database) SaveSetting(ctx context.Context, key string, value interface{}) error {
+	var valueStr string
+	var valueType string
+
+	switch v := value.(type) {
+	case int:
+		valueStr = fmt.Sprintf("%d", v)
+		valueType = "int"
+	case int64:
+		valueStr = fmt.Sprintf("%d", v)
+		valueType = "int"
+	case float64:
+		valueStr = fmt.Sprintf("%f", v)
+		valueType = "float"
+	case bool:
+		if v {
+			valueStr = "1"
+		} else {
+			valueStr = "0"
+		}
+		valueType = "bool"
+	case string:
+		valueStr = v
+		valueType = "string"
+	default:
+		// For complex types, use JSON
+		data, err := json.Marshal(v)
+		if err != nil {
+			return err
+		}
+		valueStr = string(data)
+		valueType = "json"
+	}
+
+	_, err := d.db.ExecContext(ctx, `
+		INSERT OR REPLACE INTO app_settings (key, value, value_type, updated_at)
+		VALUES (?, ?, ?, ?)
+	`, key, valueStr, valueType, time.Now().Unix())
+	return err
+}
+
+// GetSettingString retrieves a string setting
+func (d *Database) GetSettingString(ctx context.Context, key string, defaultValue string) string {
+	var value string
+	err := d.db.QueryRowContext(ctx, "SELECT value FROM app_settings WHERE key = ?", key).Scan(&value)
+	if err != nil {
+		return defaultValue
+	}
+	return value
+}
+
+// GetSettingInt retrieves an int setting
+func (d *Database) GetSettingInt(ctx context.Context, key string, defaultValue int) int {
+	var value string
+	err := d.db.QueryRowContext(ctx, "SELECT value FROM app_settings WHERE key = ?", key).Scan(&value)
+	if err != nil {
+		return defaultValue
+	}
+	var result int
+	fmt.Sscanf(value, "%d", &result)
+	return result
+}
+
+// GetSettingInt64 retrieves an int64 setting
+func (d *Database) GetSettingInt64(ctx context.Context, key string, defaultValue int64) int64 {
+	var value string
+	err := d.db.QueryRowContext(ctx, "SELECT value FROM app_settings WHERE key = ?", key).Scan(&value)
+	if err != nil {
+		return defaultValue
+	}
+	var result int64
+	fmt.Sscanf(value, "%d", &result)
+	return result
+}
+
+// GetSettingFloat retrieves a float setting
+func (d *Database) GetSettingFloat(ctx context.Context, key string, defaultValue float64) float64 {
+	var value string
+	err := d.db.QueryRowContext(ctx, "SELECT value FROM app_settings WHERE key = ?", key).Scan(&value)
+	if err != nil {
+		return defaultValue
+	}
+	var result float64
+	fmt.Sscanf(value, "%f", &result)
+	return result
+}
+
+// GetSettingBool retrieves a bool setting
+func (d *Database) GetSettingBool(ctx context.Context, key string, defaultValue bool) bool {
+	var value string
+	err := d.db.QueryRowContext(ctx, "SELECT value FROM app_settings WHERE key = ?", key).Scan(&value)
+	if err != nil {
+		return defaultValue
+	}
+	return value == "1" || value == "true"
+}
+
+// SaveConfig saves all config settings to the database
+func (d *Database) SaveConfig(ctx context.Context, cfg *Config) error {
+	// Use a transaction for atomicity
+	tx, err := d.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	settings := map[string]interface{}{
+		"cache_mode":                  int(cfg.Mode),
+		"memory_messages_per_channel": cfg.MemoryMessagesPerChannel,
+		"memory_guilds_max":           cfg.MemoryGuildsMax,
+		"memory_presences_max":        cfg.MemoryPresencesMax,
+		"database_max_size_mb":        cfg.DatabaseMaxSizeMB,
+		"database_messages_max":       cfg.DatabaseMessagesMax,
+		"database_attachments_max":    cfg.DatabaseAttachmentsMax,
+		"auto_reserve_storage_mb":     cfg.AutoReserveStorageMB,
+		"auto_max_storage_percent":    cfg.AutoMaxStoragePercent,
+		"cleanup_interval_minutes":    cfg.CleanupIntervalMinutes,
+		"cleanup_on_low_memory":       cfg.CleanupOnLowMemory,
+		"vacuum_on_cleanup":           cfg.VacuumOnCleanup,
+		"debug_enabled":               cfg.DebugEnabled,
+		"debug_level":                 int(cfg.DebugLevel),
+		"debug_stack_traces":          cfg.DebugStackTraces,
+		"debug_log_to_file":           cfg.DebugLogToFile,
+		"debug_log_file":              cfg.DebugLogFile,
+	}
+
+	stmt, err := tx.PrepareContext(ctx, `
+		INSERT OR REPLACE INTO app_settings (key, value, value_type, updated_at)
+		VALUES (?, ?, ?, ?)
+	`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	now := time.Now().Unix()
+	for key, value := range settings {
+		var valueStr string
+		var valueType string
+
+		switch v := value.(type) {
+		case int:
+			valueStr = fmt.Sprintf("%d", v)
+			valueType = "int"
+		case int64:
+			valueStr = fmt.Sprintf("%d", v)
+			valueType = "int"
+		case float64:
+			valueStr = fmt.Sprintf("%f", v)
+			valueType = "float"
+		case bool:
+			if v {
+				valueStr = "1"
+			} else {
+				valueStr = "0"
+			}
+			valueType = "bool"
+		case string:
+			valueStr = v
+			valueType = "string"
+		}
+
+		if _, err := stmt.ExecContext(ctx, key, valueStr, valueType, now); err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
+}
+
+// LoadConfigFromDB loads config from the database, using defaults for missing values
+func (d *Database) LoadConfigFromDB(ctx context.Context, dataDir string) *Config {
+	cfg := DefaultConfig()
+	cfg.DataDir = dataDir
+
+	cfg.Mode = CacheLimitMode(d.GetSettingInt(ctx, "cache_mode", int(cfg.Mode)))
+	cfg.MemoryMessagesPerChannel = d.GetSettingInt(ctx, "memory_messages_per_channel", cfg.MemoryMessagesPerChannel)
+	cfg.MemoryGuildsMax = d.GetSettingInt(ctx, "memory_guilds_max", cfg.MemoryGuildsMax)
+	cfg.MemoryPresencesMax = d.GetSettingInt(ctx, "memory_presences_max", cfg.MemoryPresencesMax)
+	cfg.DatabaseMaxSizeMB = d.GetSettingInt64(ctx, "database_max_size_mb", cfg.DatabaseMaxSizeMB)
+	cfg.DatabaseMessagesMax = d.GetSettingInt(ctx, "database_messages_max", cfg.DatabaseMessagesMax)
+	cfg.DatabaseAttachmentsMax = d.GetSettingInt(ctx, "database_attachments_max", cfg.DatabaseAttachmentsMax)
+	cfg.AutoReserveStorageMB = d.GetSettingInt64(ctx, "auto_reserve_storage_mb", cfg.AutoReserveStorageMB)
+	cfg.AutoMaxStoragePercent = d.GetSettingFloat(ctx, "auto_max_storage_percent", cfg.AutoMaxStoragePercent)
+	cfg.CleanupIntervalMinutes = d.GetSettingInt(ctx, "cleanup_interval_minutes", cfg.CleanupIntervalMinutes)
+	cfg.CleanupOnLowMemory = d.GetSettingBool(ctx, "cleanup_on_low_memory", cfg.CleanupOnLowMemory)
+	cfg.VacuumOnCleanup = d.GetSettingBool(ctx, "vacuum_on_cleanup", cfg.VacuumOnCleanup)
+	cfg.DebugEnabled = d.GetSettingBool(ctx, "debug_enabled", cfg.DebugEnabled)
+	cfg.DebugLevel = DebugLevel(d.GetSettingInt(ctx, "debug_level", int(cfg.DebugLevel)))
+	cfg.DebugStackTraces = d.GetSettingBool(ctx, "debug_stack_traces", cfg.DebugStackTraces)
+	cfg.DebugLogToFile = d.GetSettingBool(ctx, "debug_log_to_file", cfg.DebugLogToFile)
+	cfg.DebugLogFile = d.GetSettingString(ctx, "debug_log_file", cfg.DebugLogFile)
+
+	return cfg
 }
 
 // SaveUser saves or updates a user
