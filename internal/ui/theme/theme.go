@@ -1,22 +1,21 @@
 // Copyright (C) 2025 blubskye
-  //
-  // This program is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Affero General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-  //
-  // This program is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Affero General Public License for more details.
-  //
-  // You should have received a copy of the GNU Affero General Public License
-  // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  //
-  // Source code: https://github.com/blubskye/godiscordmobileclient
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Source code: https://github.com/blubskye/godiscordmobileclient
 
-  
-package ui
+package theme
 
 import (
 	"image/color"
@@ -42,12 +41,12 @@ var (
 	ColorTextLink      = rgb(0x00a8fc) // Links
 
 	// Brand colors
-	ColorBlurple       = rgb(0x5865f2) // Discord blurple
-	ColorBlurpleHover  = rgb(0x4752c4) // Blurple hover
-	ColorGreen         = rgb(0x57f287) // Online/success
-	ColorYellow        = rgb(0xfee75c) // Idle/warning
-	ColorRed           = rgb(0xed4245) // DND/error
-	ColorGray          = rgb(0x747f8d) // Offline
+	ColorBlurple      = rgb(0x5865f2) // Discord blurple
+	ColorBlurpleHover = rgb(0x4752c4) // Blurple hover
+	ColorGreen        = rgb(0x57f287) // Online/success
+	ColorYellow       = rgb(0xfee75c) // Idle/warning
+	ColorRed          = rgb(0xed4245) // DND/error
+	ColorGray         = rgb(0x747f8d) // Offline
 
 	// Status colors
 	ColorOnline    = ColorGreen
@@ -57,10 +56,10 @@ var (
 	ColorInvisible = ColorGray
 
 	// UI elements
-	ColorDivider    = rgb(0x3f4147)
-	ColorScrollbar  = rgb(0x1e1f22)
-	ColorMention    = rgba(0xfaa61a, 0x1a) // Mention background
-	ColorSelection  = rgba(0x5865f2, 0x40) // Selection background
+	ColorDivider   = rgb(0x3f4147)
+	ColorScrollbar = rgb(0x1e1f22)
+	ColorMention   = rgba(0xfaa61a, 0x1a) // Mention background
+	ColorSelection = rgba(0x5865f2, 0x40) // Selection background
 )
 
 // rgb creates a color from a hex value
@@ -88,24 +87,24 @@ type Theme struct {
 	*material.Theme
 
 	// Colors
-	Background       color.NRGBA
-	BackgroundDark   color.NRGBA
-	BackgroundLight  color.NRGBA
-	TextPrimary      color.NRGBA
-	TextSecondary    color.NRGBA
-	TextMuted        color.NRGBA
-	Accent           color.NRGBA
-	AccentHover      color.NRGBA
-	Online           color.NRGBA
-	Idle             color.NRGBA
-	DND              color.NRGBA
-	Offline          color.NRGBA
-	Divider          color.NRGBA
-	Error            color.NRGBA
+	Background      color.NRGBA
+	BackgroundDark  color.NRGBA
+	BackgroundLight color.NRGBA
+	TextPrimary     color.NRGBA
+	TextSecondary   color.NRGBA
+	TextMuted       color.NRGBA
+	Accent          color.NRGBA
+	AccentHover     color.NRGBA
+	Online          color.NRGBA
+	Idle            color.NRGBA
+	DND             color.NRGBA
+	Offline         color.NRGBA
+	Divider         color.NRGBA
+	Error           color.NRGBA
 }
 
-// NewTheme creates a Discord-like theme
-func NewTheme() *Theme {
+// New creates a Discord-like theme
+func New() *Theme {
 	th := material.NewTheme()
 
 	// Configure fonts
@@ -136,15 +135,8 @@ func NewTheme() *Theme {
 
 // defaultFonts returns the default font collection
 func defaultFonts() []font.FontFace {
-	return []font.FontFace{
-		{Font: font.Font{Typeface: "Go"}, Face: defaultFont()},
-	}
-}
-
-// defaultFont returns a placeholder for the default font face
-// In a real app, you'd load actual font files
-func defaultFont() text.Face {
-	return nil // Gio will use system fonts as fallback
+	// Return empty collection - Gio will use system fonts as fallback
+	return nil
 }
 
 // StatusColor returns the color for a user status
