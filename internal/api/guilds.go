@@ -1,21 +1,20 @@
 // Copyright (C) 2025 blubskye
-  //
-  // This program is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Affero General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-  //
-  // This program is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Affero General Public License for more details.
-  //
-  // You should have received a copy of the GNU Affero General Public License
-  // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  //
-  // Source code: https://github.com/blubskye/godiscordmobileclient
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Source code: https://github.com/blubskye/godiscordmobileclient
 
-  
 package api
 
 import (
@@ -203,20 +202,20 @@ func (c *Client) GetGuildStickers(ctx context.Context, guildID string) ([]models
 
 // Invite represents a guild invite
 type Invite struct {
-	Code                     string         `json:"code"`
-	Guild                    *models.Guild  `json:"guild,omitempty"`
+	Code                     string          `json:"code"`
+	Guild                    *models.Guild   `json:"guild,omitempty"`
 	Channel                  *models.Channel `json:"channel,omitempty"`
-	Inviter                  *models.User   `json:"inviter,omitempty"`
-	TargetType               int            `json:"target_type,omitempty"`
-	TargetUser               *models.User   `json:"target_user,omitempty"`
-	ApproximatePresenceCount int            `json:"approximate_presence_count,omitempty"`
-	ApproximateMemberCount   int            `json:"approximate_member_count,omitempty"`
-	ExpiresAt                string         `json:"expires_at,omitempty"`
-	Uses                     int            `json:"uses,omitempty"`
-	MaxUses                  int            `json:"max_uses,omitempty"`
-	MaxAge                   int            `json:"max_age,omitempty"`
-	Temporary                bool           `json:"temporary,omitempty"`
-	CreatedAt                string         `json:"created_at,omitempty"`
+	Inviter                  *models.User    `json:"inviter,omitempty"`
+	TargetType               int             `json:"target_type,omitempty"`
+	TargetUser               *models.User    `json:"target_user,omitempty"`
+	ApproximatePresenceCount int             `json:"approximate_presence_count,omitempty"`
+	ApproximateMemberCount   int             `json:"approximate_member_count,omitempty"`
+	ExpiresAt                string          `json:"expires_at,omitempty"`
+	Uses                     int             `json:"uses,omitempty"`
+	MaxUses                  int             `json:"max_uses,omitempty"`
+	MaxAge                   int             `json:"max_age,omitempty"`
+	Temporary                bool            `json:"temporary,omitempty"`
+	CreatedAt                string          `json:"created_at,omitempty"`
 }
 
 // GetInvite returns an invite by code

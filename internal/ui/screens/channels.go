@@ -29,14 +29,13 @@ import (
 	"gioui.org/widget/material"
 
 	"github.com/blubskye/godiscordmobileclient/internal/models"
-	"github.com/blubskye/godiscordmobileclient/internal/state"
 	"github.com/blubskye/godiscordmobileclient/internal/ui/theme"
 )
 
 // ChannelsScreen displays channels for a guild
 type ChannelsScreen struct {
 	theme           *theme.Theme
-	cache           *state.Cache
+	cache           CacheInterface
 	onChannelSelect func(channelID string)
 	onBack          func()
 
@@ -46,7 +45,7 @@ type ChannelsScreen struct {
 }
 
 // NewChannelsScreen creates a new channels screen
-func NewChannelsScreen(theme *theme.Theme, cache *state.Cache, onSelect func(channelID string), onBack func()) *ChannelsScreen {
+func NewChannelsScreen(theme *theme.Theme, cache CacheInterface, onSelect func(channelID string), onBack func()) *ChannelsScreen {
 	return &ChannelsScreen{
 		theme:           theme,
 		cache:           cache,

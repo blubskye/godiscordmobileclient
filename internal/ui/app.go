@@ -29,6 +29,7 @@ import (
 	"github.com/blubskye/godiscordmobileclient/internal/gateway"
 	"github.com/blubskye/godiscordmobileclient/internal/models"
 	"github.com/blubskye/godiscordmobileclient/internal/state"
+	"github.com/blubskye/godiscordmobileclient/internal/storage"
 	"github.com/blubskye/godiscordmobileclient/internal/ui/screens"
 	"github.com/blubskye/godiscordmobileclient/internal/ui/theme"
 )
@@ -48,16 +49,16 @@ const (
 
 // App holds the application state
 type App struct {
-	window  *app.Window
-	theme   *theme.Theme
-	screen  Screen
-	ctx     context.Context
-	cancel  context.CancelFunc
+	window *app.Window
+	theme  *theme.Theme
+	screen Screen
+	ctx    context.Context
+	cancel context.CancelFunc
 
 	// Discord clients
 	api     *api.Client
 	gateway *gateway.Client
-	cache   *state.Cache
+	cache   state.CacheInterface
 
 	// Screens
 	loginScreen    *screens.LoginScreen
@@ -75,7 +76,28 @@ type App struct {
 func NewApp(w *app.Window) *App {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	cache := state.NewCache()
+	// Load storage config and create hybrid cache
+	config, err := storage.LoadConfig("")
+	if err != nil {
+		log.Printf("Failed to load config, using defaults: %v", err)
+		config = storage.DefaultConfig()
+	}
+
+	cache, err := storage.NewHybridCache(config)
+	if err != nil {
+		log.Printf("Failed to create hybrid cache, falling back to in-memory: %v", err)
+		// Fall back to in-memory cache if hybrid fails
+		cache = nil
+	}
+
+	// Use CacheInterface - either HybridCache or fall back to in-memory Cache
+	var cacheInterface state.CacheInterface
+	if cache != nil {
+		cacheInterface = cache
+	} else {
+		cacheInterface = state.NewCache()
+	}
+
 	apiClient := api.NewClient("")
 	gatewayClient := gateway.NewClient("")
 
@@ -87,27 +109,27 @@ func NewApp(w *app.Window) *App {
 		cancel:  cancel,
 		api:     apiClient,
 		gateway: gatewayClient,
-		cache:   cache,
+		cache:   cacheInterface,
 	}
 
 	// Initialize screens
 	a.loginScreen = screens.NewLoginScreen(a.theme, a.onLogin)
-	a.guildsScreen = screens.NewGuildsScreen(a.theme, cache, a.onGuildSelect)
-	a.channelsScreen = screens.NewChannelsScreen(a.theme, cache, a.onChannelSelect, a.onBackToGuilds)
-	a.chatScreen = screens.NewChatScreen(a.theme, cache, apiClient, a.onBackToChannels)
+	a.guildsScreen = screens.NewGuildsScreen(a.theme, cacheInterface, a.onGuildSelect)
+	a.channelsScreen = screens.NewChannelsScreen(a.theme, cacheInterface, a.onChannelSelect, a.onBackToGuilds)
+	a.chatScreen = screens.NewChatScreen(a.theme, cacheInterface, apiClient, a.onBackToChannels)
 	a.aboutScreen = screens.NewAboutScreen(a.theme, a.onBackFromAbout)
 
 	// Register gateway event handler
-	gatewayClient.OnEvent(cache.HandleEvent)
+	gatewayClient.OnEvent(cacheInterface.HandleEvent)
 
 	// Set up cache callbacks to invalidate UI
-	cache.OnReady(func() {
+	cacheInterface.OnReady(func() {
 		w.Invalidate()
 	})
-	cache.OnMessageCreate(func(m *models.Message) {
+	cacheInterface.OnMessageCreate(func(m *models.Message) {
 		w.Invalidate()
 	})
-	cache.OnGuildCreate(func(g *models.Guild) {
+	cacheInterface.OnGuildCreate(func(g *models.Guild) {
 		w.Invalidate()
 	})
 
@@ -124,6 +146,12 @@ func (a *App) Run() error {
 			a.cancel()
 			if a.gateway.IsConnected() {
 				a.gateway.Disconnect()
+			}
+			// Close cache if it supports closing (HybridCache does)
+			if closer, ok := a.cache.(interface{ Close() error }); ok {
+				if err := closer.Close(); err != nil {
+					log.Printf("Error closing cache: %v", err)
+				}
 			}
 			return e.Err
 

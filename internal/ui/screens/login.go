@@ -33,8 +33,8 @@ import (
 
 // LoginScreen handles user authentication
 type LoginScreen struct {
-	theme    *theme.Theme
-	onLogin  func(token string)
+	theme   *theme.Theme
+	onLogin func(token string)
 
 	// Login mode: token or email/password
 	useToken bool
@@ -48,14 +48,14 @@ type LoginScreen struct {
 	mfaEditor      widget.Editor
 
 	// Buttons
-	loginButton     widget.Clickable
+	loginButton      widget.Clickable
 	switchModeButton widget.Clickable
 
 	// State
-	loading    bool
-	error      string
-	needsMFA   bool
-	mfaTicket  string
+	loading   bool
+	error     string
+	needsMFA  bool
+	mfaTicket string
 }
 
 // NewLoginScreen creates a new login screen
@@ -236,9 +236,9 @@ func (s *LoginScreen) layoutEditor(gtx layout.Context, editor *widget.Editor, hi
 	paint.FillShape(gtx.Ops, theme.ColorBackgroundLight, rr.Op(gtx.Ops))
 
 	return layout.Inset{
-		Left:  unit.Dp(12),
-		Right: unit.Dp(12),
-		Top:   unit.Dp(12),
+		Left:   unit.Dp(12),
+		Right:  unit.Dp(12),
+		Top:    unit.Dp(12),
 		Bottom: unit.Dp(12),
 	}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 		editor.SingleLine = true

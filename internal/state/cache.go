@@ -1,21 +1,20 @@
 // Copyright (C) 2025 blubskye
-  //
-  // This program is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Affero General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-  //
-  // This program is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Affero General Public License for more details.
-  //
-  // You should have received a copy of the GNU Affero General Public License
-  // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  //
-  // Source code: https://github.com/blubskye/godiscordmobileclient
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Source code: https://github.com/blubskye/godiscordmobileclient
 
-  
 package state
 
 import (
@@ -61,20 +60,20 @@ type Cache struct {
 	Typing map[string]map[string]int64
 
 	// Event callbacks
-	onGuildCreate   func(*models.Guild)
-	onGuildDelete   func(string)
-	onChannelCreate func(*models.Channel)
-	onChannelDelete func(*models.Channel)
-	onMessageCreate func(*models.Message)
-	onMessageUpdate func(*models.Message)
-	onMessageDelete func(channelID, messageID string)
-	onTypingStart   func(*models.TypingStart)
-	onPresenceUpdate func(*models.Presence)
-	onRelationshipAdd func(*models.Relationship)
+	onGuildCreate        func(*models.Guild)
+	onGuildDelete        func(string)
+	onChannelCreate      func(*models.Channel)
+	onChannelDelete      func(*models.Channel)
+	onMessageCreate      func(*models.Message)
+	onMessageUpdate      func(*models.Message)
+	onMessageDelete      func(channelID, messageID string)
+	onTypingStart        func(*models.TypingStart)
+	onPresenceUpdate     func(*models.Presence)
+	onRelationshipAdd    func(*models.Relationship)
 	onRelationshipRemove func(string)
-	onVoiceStateUpdate func(*models.VoiceState)
-	onVoiceServerUpdate func(*gateway.VoiceServerUpdateData)
-	onReady         func()
+	onVoiceStateUpdate   func(*models.VoiceState)
+	onVoiceServerUpdate  func(*gateway.VoiceServerUpdateData)
+	onReady              func()
 }
 
 // NewCache creates a new state cache
@@ -93,20 +92,22 @@ func NewCache() *Cache {
 }
 
 // Event handlers setters
-func (c *Cache) OnGuildCreate(fn func(*models.Guild))         { c.onGuildCreate = fn }
-func (c *Cache) OnGuildDelete(fn func(string))                 { c.onGuildDelete = fn }
-func (c *Cache) OnChannelCreate(fn func(*models.Channel))      { c.onChannelCreate = fn }
-func (c *Cache) OnChannelDelete(fn func(*models.Channel))      { c.onChannelDelete = fn }
-func (c *Cache) OnMessageCreate(fn func(*models.Message))      { c.onMessageCreate = fn }
-func (c *Cache) OnMessageUpdate(fn func(*models.Message))      { c.onMessageUpdate = fn }
+func (c *Cache) OnGuildCreate(fn func(*models.Guild))                 { c.onGuildCreate = fn }
+func (c *Cache) OnGuildDelete(fn func(string))                        { c.onGuildDelete = fn }
+func (c *Cache) OnChannelCreate(fn func(*models.Channel))             { c.onChannelCreate = fn }
+func (c *Cache) OnChannelDelete(fn func(*models.Channel))             { c.onChannelDelete = fn }
+func (c *Cache) OnMessageCreate(fn func(*models.Message))             { c.onMessageCreate = fn }
+func (c *Cache) OnMessageUpdate(fn func(*models.Message))             { c.onMessageUpdate = fn }
 func (c *Cache) OnMessageDelete(fn func(channelID, messageID string)) { c.onMessageDelete = fn }
-func (c *Cache) OnTypingStart(fn func(*models.TypingStart))    { c.onTypingStart = fn }
-func (c *Cache) OnPresenceUpdate(fn func(*models.Presence))    { c.onPresenceUpdate = fn }
-func (c *Cache) OnRelationshipAdd(fn func(*models.Relationship)) { c.onRelationshipAdd = fn }
-func (c *Cache) OnRelationshipRemove(fn func(string))          { c.onRelationshipRemove = fn }
-func (c *Cache) OnVoiceStateUpdate(fn func(*models.VoiceState)) { c.onVoiceStateUpdate = fn }
-func (c *Cache) OnVoiceServerUpdate(fn func(*gateway.VoiceServerUpdateData)) { c.onVoiceServerUpdate = fn }
-func (c *Cache) OnReady(fn func())                             { c.onReady = fn }
+func (c *Cache) OnTypingStart(fn func(*models.TypingStart))           { c.onTypingStart = fn }
+func (c *Cache) OnPresenceUpdate(fn func(*models.Presence))           { c.onPresenceUpdate = fn }
+func (c *Cache) OnRelationshipAdd(fn func(*models.Relationship))      { c.onRelationshipAdd = fn }
+func (c *Cache) OnRelationshipRemove(fn func(string))                 { c.onRelationshipRemove = fn }
+func (c *Cache) OnVoiceStateUpdate(fn func(*models.VoiceState))       { c.onVoiceStateUpdate = fn }
+func (c *Cache) OnVoiceServerUpdate(fn func(*gateway.VoiceServerUpdateData)) {
+	c.onVoiceServerUpdate = fn
+}
+func (c *Cache) OnReady(fn func()) { c.onReady = fn }
 
 // HandleEvent processes gateway events and updates state
 func (c *Cache) HandleEvent(eventType string, data json.RawMessage) {

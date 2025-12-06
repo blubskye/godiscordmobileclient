@@ -1,21 +1,20 @@
 // Copyright (C) 2025 blubskye
-  //
-  // This program is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Affero General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-  //
-  // This program is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Affero General Public License for more details.
-  //
-  // You should have received a copy of the GNU Affero General Public License
-  // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  //
-  // Source code: https://github.com/blubskye/godiscordmobileclient
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Source code: https://github.com/blubskye/godiscordmobileclient
 
-  
 package gateway
 
 import (
@@ -112,13 +111,13 @@ type RequestGuildMembersData struct {
 
 // ReadyData is received with READY event
 type ReadyData struct {
-	Version         int                     `json:"v"`
-	User            *models.User            `json:"user"`
-	Guilds          []models.UnavailableGuild `json:"guilds"`
-	SessionID       string                  `json:"session_id"`
-	ResumeGatewayURL string                 `json:"resume_gateway_url"`
-	Shard           []int                   `json:"shard,omitempty"`
-	Application     *ApplicationData        `json:"application,omitempty"`
+	Version          int                       `json:"v"`
+	User             *models.User              `json:"user"`
+	Guilds           []models.UnavailableGuild `json:"guilds"`
+	SessionID        string                    `json:"session_id"`
+	ResumeGatewayURL string                    `json:"resume_gateway_url"`
+	Shard            []int                     `json:"shard,omitempty"`
+	Application      *ApplicationData          `json:"application,omitempty"`
 
 	// User-specific fields
 	PrivateChannels   []models.Channel      `json:"private_channels,omitempty"`
@@ -234,52 +233,52 @@ type RelationshipRemoveData struct {
 
 // ReactionAddData is received with MESSAGE_REACTION_ADD event
 type ReactionAddData struct {
-	UserID          string              `json:"user_id"`
-	ChannelID       string              `json:"channel_id"`
-	MessageID       string              `json:"message_id"`
-	GuildID         string              `json:"guild_id,omitempty"`
-	Member          *models.Member      `json:"member,omitempty"`
+	UserID          string                `json:"user_id"`
+	ChannelID       string                `json:"channel_id"`
+	MessageID       string                `json:"message_id"`
+	GuildID         string                `json:"guild_id,omitempty"`
+	Member          *models.Member        `json:"member,omitempty"`
 	Emoji           *models.ReactionEmoji `json:"emoji"`
-	MessageAuthorID string              `json:"message_author_id,omitempty"`
-	Burst           bool                `json:"burst"`
-	BurstColors     []string            `json:"burst_colors,omitempty"`
+	MessageAuthorID string                `json:"message_author_id,omitempty"`
+	Burst           bool                  `json:"burst"`
+	BurstColors     []string              `json:"burst_colors,omitempty"`
 }
 
 // ReactionRemoveData is received with MESSAGE_REACTION_REMOVE event
 type ReactionRemoveData struct {
-	UserID    string              `json:"user_id"`
-	ChannelID string              `json:"channel_id"`
-	MessageID string              `json:"message_id"`
-	GuildID   string              `json:"guild_id,omitempty"`
+	UserID    string                `json:"user_id"`
+	ChannelID string                `json:"channel_id"`
+	MessageID string                `json:"message_id"`
+	GuildID   string                `json:"guild_id,omitempty"`
 	Emoji     *models.ReactionEmoji `json:"emoji"`
-	Burst     bool                `json:"burst"`
+	Burst     bool                  `json:"burst"`
 }
 
 // Event names
 const (
-	EventReady                  = "READY"
-	EventResumed                = "RESUMED"
-	EventGuildCreate            = "GUILD_CREATE"
-	EventGuildUpdate            = "GUILD_UPDATE"
-	EventGuildDelete            = "GUILD_DELETE"
-	EventChannelCreate          = "CHANNEL_CREATE"
-	EventChannelUpdate          = "CHANNEL_UPDATE"
-	EventChannelDelete          = "CHANNEL_DELETE"
-	EventMessageCreate          = "MESSAGE_CREATE"
-	EventMessageUpdate          = "MESSAGE_UPDATE"
-	EventMessageDelete          = "MESSAGE_DELETE"
-	EventMessageDeleteBulk      = "MESSAGE_DELETE_BULK"
-	EventMessageReactionAdd     = "MESSAGE_REACTION_ADD"
-	EventMessageReactionRemove  = "MESSAGE_REACTION_REMOVE"
-	EventTypingStart            = "TYPING_START"
-	EventPresenceUpdate         = "PRESENCE_UPDATE"
-	EventVoiceStateUpdate       = "VOICE_STATE_UPDATE"
-	EventVoiceServerUpdate      = "VOICE_SERVER_UPDATE"
-	EventGuildMemberAdd         = "GUILD_MEMBER_ADD"
-	EventGuildMemberRemove      = "GUILD_MEMBER_REMOVE"
-	EventGuildMemberUpdate      = "GUILD_MEMBER_UPDATE"
-	EventGuildMembersChunk      = "GUILD_MEMBERS_CHUNK"
-	EventRelationshipAdd        = "RELATIONSHIP_ADD"
-	EventRelationshipRemove     = "RELATIONSHIP_REMOVE"
-	EventUserUpdate             = "USER_UPDATE"
+	EventReady                 = "READY"
+	EventResumed               = "RESUMED"
+	EventGuildCreate           = "GUILD_CREATE"
+	EventGuildUpdate           = "GUILD_UPDATE"
+	EventGuildDelete           = "GUILD_DELETE"
+	EventChannelCreate         = "CHANNEL_CREATE"
+	EventChannelUpdate         = "CHANNEL_UPDATE"
+	EventChannelDelete         = "CHANNEL_DELETE"
+	EventMessageCreate         = "MESSAGE_CREATE"
+	EventMessageUpdate         = "MESSAGE_UPDATE"
+	EventMessageDelete         = "MESSAGE_DELETE"
+	EventMessageDeleteBulk     = "MESSAGE_DELETE_BULK"
+	EventMessageReactionAdd    = "MESSAGE_REACTION_ADD"
+	EventMessageReactionRemove = "MESSAGE_REACTION_REMOVE"
+	EventTypingStart           = "TYPING_START"
+	EventPresenceUpdate        = "PRESENCE_UPDATE"
+	EventVoiceStateUpdate      = "VOICE_STATE_UPDATE"
+	EventVoiceServerUpdate     = "VOICE_SERVER_UPDATE"
+	EventGuildMemberAdd        = "GUILD_MEMBER_ADD"
+	EventGuildMemberRemove     = "GUILD_MEMBER_REMOVE"
+	EventGuildMemberUpdate     = "GUILD_MEMBER_UPDATE"
+	EventGuildMembersChunk     = "GUILD_MEMBERS_CHUNK"
+	EventRelationshipAdd       = "RELATIONSHIP_ADD"
+	EventRelationshipRemove    = "RELATIONSHIP_REMOVE"
+	EventUserUpdate            = "USER_UPDATE"
 )

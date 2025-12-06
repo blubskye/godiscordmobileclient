@@ -1,21 +1,20 @@
 // Copyright (C) 2025 blubskye
-  //
-  // This program is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Affero General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-  //
-  // This program is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Affero General Public License for more details.
-  //
-  // You should have received a copy of the GNU Affero General Public License
-  // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  //
-  // Source code: https://github.com/blubskye/godiscordmobileclient
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Source code: https://github.com/blubskye/godiscordmobileclient
 
-  
 package api
 
 import (
@@ -29,27 +28,27 @@ import (
 
 // LoginRequest represents the login payload
 type LoginRequest struct {
-	Login            string `json:"login"`
-	Password         string `json:"password"`
-	UnderageSelfDel  bool   `json:"undelete,omitempty"`
-	CaptchaKey       string `json:"captcha_key,omitempty"`
-	LoginSource      string `json:"login_source,omitempty"`
-	GiftCodeSKUId    string `json:"gift_code_sku_id,omitempty"`
+	Login           string `json:"login"`
+	Password        string `json:"password"`
+	UnderageSelfDel bool   `json:"undelete,omitempty"`
+	CaptchaKey      string `json:"captcha_key,omitempty"`
+	LoginSource     string `json:"login_source,omitempty"`
+	GiftCodeSKUId   string `json:"gift_code_sku_id,omitempty"`
 }
 
 // LoginResponse represents the login response
 type LoginResponse struct {
-	Token           string   `json:"token,omitempty"`
-	MFA             bool     `json:"mfa,omitempty"`
-	SMS             bool     `json:"sms,omitempty"`
-	Ticket          string   `json:"ticket,omitempty"`
-	BackupCodes     bool     `json:"backup,omitempty"`
-	TOTP            bool     `json:"totp,omitempty"`
-	WebAuthn        string   `json:"webauthn,omitempty"`
-	UserID          string   `json:"user_id,omitempty"`
-	CaptchaKey      []string `json:"captcha_key,omitempty"`
-	CaptchaSiteKey  string   `json:"captcha_sitekey,omitempty"`
-	CaptchaService  string   `json:"captcha_service,omitempty"`
+	Token          string   `json:"token,omitempty"`
+	MFA            bool     `json:"mfa,omitempty"`
+	SMS            bool     `json:"sms,omitempty"`
+	Ticket         string   `json:"ticket,omitempty"`
+	BackupCodes    bool     `json:"backup,omitempty"`
+	TOTP           bool     `json:"totp,omitempty"`
+	WebAuthn       string   `json:"webauthn,omitempty"`
+	UserID         string   `json:"user_id,omitempty"`
+	CaptchaKey     []string `json:"captcha_key,omitempty"`
+	CaptchaSiteKey string   `json:"captcha_sitekey,omitempty"`
+	CaptchaService string   `json:"captcha_service,omitempty"`
 }
 
 // MFARequest represents an MFA verification request

@@ -1,21 +1,20 @@
 // Copyright (C) 2025 blubskye
-  //
-  // This program is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Affero General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-  //
-  // This program is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Affero General Public License for more details.
-  //
-  // You should have received a copy of the GNU Affero General Public License
-  // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  //
-  // Source code: https://github.com/blubskye/godiscordmobileclient
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Source code: https://github.com/blubskye/godiscordmobileclient
 
-  
 package api
 
 import (
@@ -108,17 +107,17 @@ func (c *Client) ModifyChannel(ctx context.Context, channelID string, params *Mo
 
 // ModifyChannelParams for updating channels
 type ModifyChannelParams struct {
-	Name                 string `json:"name,omitempty"`
-	Icon                 string `json:"icon,omitempty"` // Group DM icon
-	Topic                string `json:"topic,omitempty"`
-	NSFW                 *bool  `json:"nsfw,omitempty"`
-	RateLimitPerUser     *int   `json:"rate_limit_per_user,omitempty"`
-	Bitrate              *int   `json:"bitrate,omitempty"`
-	UserLimit            *int   `json:"user_limit,omitempty"`
-	Position             *int   `json:"position,omitempty"`
-	ParentID             string `json:"parent_id,omitempty"`
-	RTCRegion            string `json:"rtc_region,omitempty"`
-	VideoQualityMode     *int   `json:"video_quality_mode,omitempty"`
+	Name             string `json:"name,omitempty"`
+	Icon             string `json:"icon,omitempty"` // Group DM icon
+	Topic            string `json:"topic,omitempty"`
+	NSFW             *bool  `json:"nsfw,omitempty"`
+	RateLimitPerUser *int   `json:"rate_limit_per_user,omitempty"`
+	Bitrate          *int   `json:"bitrate,omitempty"`
+	UserLimit        *int   `json:"user_limit,omitempty"`
+	Position         *int   `json:"position,omitempty"`
+	ParentID         string `json:"parent_id,omitempty"`
+	RTCRegion        string `json:"rtc_region,omitempty"`
+	VideoQualityMode *int   `json:"video_quality_mode,omitempty"`
 }
 
 // DeleteChannel deletes a channel (or closes a DM)

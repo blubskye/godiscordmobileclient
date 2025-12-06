@@ -28,14 +28,24 @@ import (
 	"gioui.org/widget/material"
 
 	"github.com/blubskye/godiscordmobileclient/internal/models"
-	"github.com/blubskye/godiscordmobileclient/internal/state"
 	"github.com/blubskye/godiscordmobileclient/internal/ui/theme"
 )
+
+// CacheInterface defines the cache methods needed by screens
+type CacheInterface interface {
+	GetUser() *models.User
+	GetGuild(id string) *models.Guild
+	GetGuilds() []*models.Guild
+	GetChannel(id string) *models.Channel
+	GetGuildChannels(guildID string) []*models.Channel
+	GetDMChannels() []*models.Channel
+	GetMessages(channelID string) []*models.Message
+}
 
 // GuildsScreen displays the list of guilds (servers)
 type GuildsScreen struct {
 	theme         *theme.Theme
-	cache         *state.Cache
+	cache         CacheInterface
 	onGuildSelect func(guildID string)
 
 	list         widget.List
@@ -43,7 +53,7 @@ type GuildsScreen struct {
 }
 
 // NewGuildsScreen creates a new guilds screen
-func NewGuildsScreen(theme *theme.Theme, cache *state.Cache, onSelect func(guildID string)) *GuildsScreen {
+func NewGuildsScreen(theme *theme.Theme, cache CacheInterface, onSelect func(guildID string)) *GuildsScreen {
 	return &GuildsScreen{
 		theme:         theme,
 		cache:         cache,
@@ -81,9 +91,9 @@ func (s *GuildsScreen) layoutHeader(gtx layout.Context) layout.Dimensions {
 		// Content
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 			return layout.Inset{
-				Left:  unit.Dp(16),
-				Right: unit.Dp(16),
-				Top:   unit.Dp(16),
+				Left:   unit.Dp(16),
+				Right:  unit.Dp(16),
+				Top:    unit.Dp(16),
 				Bottom: unit.Dp(16),
 			}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				title := material.H6(s.theme.Theme, "Servers")

@@ -1,21 +1,20 @@
 // Copyright (C) 2025 blubskye
-  //
-  // This program is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Affero General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-  //
-  // This program is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Affero General Public License for more details.
-  //
-  // You should have received a copy of the GNU Affero General Public License
-  // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  //
-  // Source code: https://github.com/blubskye/godiscordmobileclient
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Source code: https://github.com/blubskye/godiscordmobileclient
 
-  
 package api
 
 import (
@@ -130,26 +129,26 @@ func (c *Client) SendFriendRequest(ctx context.Context, username string) error {
 
 // UserSettings represents user settings
 type UserSettings struct {
-	Locale                     string   `json:"locale,omitempty"`
-	Theme                      string   `json:"theme,omitempty"`
-	ShowCurrentGame            bool     `json:"show_current_game,omitempty"`
-	InlineAttachmentMedia      bool     `json:"inline_attachment_media,omitempty"`
-	InlineEmbedMedia           bool     `json:"inline_embed_media,omitempty"`
-	RenderEmbeds               bool     `json:"render_embeds,omitempty"`
-	RenderReactions            bool     `json:"render_reactions,omitempty"`
-	AnimateEmoji               bool     `json:"animate_emoji,omitempty"`
-	EnableTTSCommand           bool     `json:"enable_tts_command,omitempty"`
-	MessageDisplayCompact      bool     `json:"message_display_compact,omitempty"`
-	ConvertEmoticons           bool     `json:"convert_emoticons,omitempty"`
-	ExplicitContentFilter      int      `json:"explicit_content_filter,omitempty"`
-	DisableGamesTab            bool     `json:"disable_games_tab,omitempty"`
-	DeveloperMode              bool     `json:"developer_mode,omitempty"`
-	GIFAutoPlay                bool     `json:"gif_auto_play,omitempty"`
-	AnimateStickers            int      `json:"animate_stickers,omitempty"`
-	Status                     string   `json:"status,omitempty"`
-	CustomStatus               *CustomStatus `json:"custom_status,omitempty"`
-	RestrictedGuilds           []string `json:"restricted_guilds,omitempty"`
-	FriendSourceFlags          *FriendSourceFlags `json:"friend_source_flags,omitempty"`
+	Locale                string             `json:"locale,omitempty"`
+	Theme                 string             `json:"theme,omitempty"`
+	ShowCurrentGame       bool               `json:"show_current_game,omitempty"`
+	InlineAttachmentMedia bool               `json:"inline_attachment_media,omitempty"`
+	InlineEmbedMedia      bool               `json:"inline_embed_media,omitempty"`
+	RenderEmbeds          bool               `json:"render_embeds,omitempty"`
+	RenderReactions       bool               `json:"render_reactions,omitempty"`
+	AnimateEmoji          bool               `json:"animate_emoji,omitempty"`
+	EnableTTSCommand      bool               `json:"enable_tts_command,omitempty"`
+	MessageDisplayCompact bool               `json:"message_display_compact,omitempty"`
+	ConvertEmoticons      bool               `json:"convert_emoticons,omitempty"`
+	ExplicitContentFilter int                `json:"explicit_content_filter,omitempty"`
+	DisableGamesTab       bool               `json:"disable_games_tab,omitempty"`
+	DeveloperMode         bool               `json:"developer_mode,omitempty"`
+	GIFAutoPlay           bool               `json:"gif_auto_play,omitempty"`
+	AnimateStickers       int                `json:"animate_stickers,omitempty"`
+	Status                string             `json:"status,omitempty"`
+	CustomStatus          *CustomStatus      `json:"custom_status,omitempty"`
+	RestrictedGuilds      []string           `json:"restricted_guilds,omitempty"`
+	FriendSourceFlags     *FriendSourceFlags `json:"friend_source_flags,omitempty"`
 }
 
 type CustomStatus struct {

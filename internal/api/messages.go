@@ -1,21 +1,20 @@
 // Copyright (C) 2025 blubskye
-  //
-  // This program is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Affero General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-  //
-  // This program is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Affero General Public License for more details.
-  //
-  // You should have received a copy of the GNU Affero General Public License
-  // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  //
-  // Source code: https://github.com/blubskye/godiscordmobileclient
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Source code: https://github.com/blubskye/godiscordmobileclient
 
-  
 package api
 
 import (
@@ -125,11 +124,11 @@ func (c *Client) ReplyToMessage(ctx context.Context, channelID, messageID, conte
 
 // EditMessageParams for editing messages
 type EditMessageParams struct {
-	Content         string                   `json:"content,omitempty"`
-	Embeds          []models.Embed           `json:"embeds,omitempty"`
-	Flags           *int                     `json:"flags,omitempty"`
-	AllowedMentions *models.AllowedMentions  `json:"allowed_mentions,omitempty"`
-	Components      []models.Component       `json:"components,omitempty"`
+	Content         string                  `json:"content,omitempty"`
+	Embeds          []models.Embed          `json:"embeds,omitempty"`
+	Flags           *int                    `json:"flags,omitempty"`
+	AllowedMentions *models.AllowedMentions `json:"allowed_mentions,omitempty"`
+	Components      []models.Component      `json:"components,omitempty"`
 }
 
 // EditMessage edits a message
@@ -229,23 +228,23 @@ func (c *Client) DeleteAllReactionsForEmoji(ctx context.Context, channelID, mess
 
 // SearchMessagesParams for searching messages
 type SearchMessagesParams struct {
-	Content       string   `json:"content,omitempty"`
-	AuthorID      string   `json:"author_id,omitempty"`
-	Mentions      string   `json:"mentions,omitempty"`
-	Has           string   `json:"has,omitempty"` // link, embed, file, video, image, sound, sticker
-	MinID         string   `json:"min_id,omitempty"`
-	MaxID         string   `json:"max_id,omitempty"`
-	ChannelID     string   `json:"channel_id,omitempty"`
-	Pinned        *bool    `json:"pinned,omitempty"`
-	Offset        int      `json:"offset,omitempty"`
-	Limit         int      `json:"limit,omitempty"` // Default 25, max 25
-	SortBy        string   `json:"sort_by,omitempty"` // relevance or timestamp
-	SortOrder     string   `json:"sort_order,omitempty"` // asc or desc
+	Content   string `json:"content,omitempty"`
+	AuthorID  string `json:"author_id,omitempty"`
+	Mentions  string `json:"mentions,omitempty"`
+	Has       string `json:"has,omitempty"` // link, embed, file, video, image, sound, sticker
+	MinID     string `json:"min_id,omitempty"`
+	MaxID     string `json:"max_id,omitempty"`
+	ChannelID string `json:"channel_id,omitempty"`
+	Pinned    *bool  `json:"pinned,omitempty"`
+	Offset    int    `json:"offset,omitempty"`
+	Limit     int    `json:"limit,omitempty"`      // Default 25, max 25
+	SortBy    string `json:"sort_by,omitempty"`    // relevance or timestamp
+	SortOrder string `json:"sort_order,omitempty"` // asc or desc
 }
 
 // SearchResult from message search
 type SearchResult struct {
-	TotalResults int               `json:"total_results"`
+	TotalResults int                `json:"total_results"`
 	Messages     [][]models.Message `json:"messages"` // Each result is an array with context
 }
 

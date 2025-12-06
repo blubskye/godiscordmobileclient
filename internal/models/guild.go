@@ -1,79 +1,78 @@
 // Copyright (C) 2025 blubskye
-  //
-  // This program is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Affero General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-  //
-  // This program is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Affero General Public License for more details.
-  //
-  // You should have received a copy of the GNU Affero General Public License
-  // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  //
-  // Source code: https://github.com/blubskye/godiscordmobileclient
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Source code: https://github.com/blubskye/godiscordmobileclient
 
-  
 package models
 
 // Guild represents a Discord server
 type Guild struct {
-	ID                          string        `json:"id"`
-	Name                        string        `json:"name"`
-	Icon                        string        `json:"icon,omitempty"`
-	IconHash                    string        `json:"icon_hash,omitempty"`
-	Splash                      string        `json:"splash,omitempty"`
-	DiscoverySplash             string        `json:"discovery_splash,omitempty"`
-	Owner                       bool          `json:"owner,omitempty"`
-	OwnerID                     string        `json:"owner_id"`
-	Permissions                 string        `json:"permissions,omitempty"`
-	Region                      string        `json:"region,omitempty"`
-	AFKChannelID                string        `json:"afk_channel_id,omitempty"`
-	AFKTimeout                  int           `json:"afk_timeout"`
-	WidgetEnabled               bool          `json:"widget_enabled,omitempty"`
-	WidgetChannelID             string        `json:"widget_channel_id,omitempty"`
-	VerificationLevel           int           `json:"verification_level"`
-	DefaultMessageNotifications int           `json:"default_message_notifications"`
-	ExplicitContentFilter       int           `json:"explicit_content_filter"`
-	Roles                       []Role        `json:"roles"`
-	Emojis                      []Emoji       `json:"emojis"`
-	Features                    []string      `json:"features"`
-	MFALevel                    int           `json:"mfa_level"`
-	ApplicationID               string        `json:"application_id,omitempty"`
-	SystemChannelID             string        `json:"system_channel_id,omitempty"`
-	SystemChannelFlags          int           `json:"system_channel_flags"`
-	RulesChannelID              string        `json:"rules_channel_id,omitempty"`
-	MaxPresences                int           `json:"max_presences,omitempty"`
-	MaxMembers                  int           `json:"max_members,omitempty"`
-	VanityURLCode               string        `json:"vanity_url_code,omitempty"`
-	Description                 string        `json:"description,omitempty"`
-	Banner                      string        `json:"banner,omitempty"`
-	PremiumTier                 int           `json:"premium_tier"`
-	PremiumSubscriptionCount    int           `json:"premium_subscription_count,omitempty"`
-	PreferredLocale             string        `json:"preferred_locale"`
-	PublicUpdatesChannelID      string        `json:"public_updates_channel_id,omitempty"`
-	MaxVideoChannelUsers        int           `json:"max_video_channel_users,omitempty"`
-	MaxStageVideoChannelUsers   int           `json:"max_stage_video_channel_users,omitempty"`
-	ApproximateMemberCount      int           `json:"approximate_member_count,omitempty"`
-	ApproximatePresenceCount    int           `json:"approximate_presence_count,omitempty"`
+	ID                          string         `json:"id"`
+	Name                        string         `json:"name"`
+	Icon                        string         `json:"icon,omitempty"`
+	IconHash                    string         `json:"icon_hash,omitempty"`
+	Splash                      string         `json:"splash,omitempty"`
+	DiscoverySplash             string         `json:"discovery_splash,omitempty"`
+	Owner                       bool           `json:"owner,omitempty"`
+	OwnerID                     string         `json:"owner_id"`
+	Permissions                 string         `json:"permissions,omitempty"`
+	Region                      string         `json:"region,omitempty"`
+	AFKChannelID                string         `json:"afk_channel_id,omitempty"`
+	AFKTimeout                  int            `json:"afk_timeout"`
+	WidgetEnabled               bool           `json:"widget_enabled,omitempty"`
+	WidgetChannelID             string         `json:"widget_channel_id,omitempty"`
+	VerificationLevel           int            `json:"verification_level"`
+	DefaultMessageNotifications int            `json:"default_message_notifications"`
+	ExplicitContentFilter       int            `json:"explicit_content_filter"`
+	Roles                       []Role         `json:"roles"`
+	Emojis                      []Emoji        `json:"emojis"`
+	Features                    []string       `json:"features"`
+	MFALevel                    int            `json:"mfa_level"`
+	ApplicationID               string         `json:"application_id,omitempty"`
+	SystemChannelID             string         `json:"system_channel_id,omitempty"`
+	SystemChannelFlags          int            `json:"system_channel_flags"`
+	RulesChannelID              string         `json:"rules_channel_id,omitempty"`
+	MaxPresences                int            `json:"max_presences,omitempty"`
+	MaxMembers                  int            `json:"max_members,omitempty"`
+	VanityURLCode               string         `json:"vanity_url_code,omitempty"`
+	Description                 string         `json:"description,omitempty"`
+	Banner                      string         `json:"banner,omitempty"`
+	PremiumTier                 int            `json:"premium_tier"`
+	PremiumSubscriptionCount    int            `json:"premium_subscription_count,omitempty"`
+	PreferredLocale             string         `json:"preferred_locale"`
+	PublicUpdatesChannelID      string         `json:"public_updates_channel_id,omitempty"`
+	MaxVideoChannelUsers        int            `json:"max_video_channel_users,omitempty"`
+	MaxStageVideoChannelUsers   int            `json:"max_stage_video_channel_users,omitempty"`
+	ApproximateMemberCount      int            `json:"approximate_member_count,omitempty"`
+	ApproximatePresenceCount    int            `json:"approximate_presence_count,omitempty"`
 	WelcomeScreen               *WelcomeScreen `json:"welcome_screen,omitempty"`
-	NSFWLevel                   int           `json:"nsfw_level"`
-	Stickers                    []Sticker     `json:"stickers,omitempty"`
-	PremiumProgressBarEnabled   bool          `json:"premium_progress_bar_enabled"`
-	SafetyAlertsChannelID       string        `json:"safety_alerts_channel_id,omitempty"`
+	NSFWLevel                   int            `json:"nsfw_level"`
+	Stickers                    []Sticker      `json:"stickers,omitempty"`
+	PremiumProgressBarEnabled   bool           `json:"premium_progress_bar_enabled"`
+	SafetyAlertsChannelID       string         `json:"safety_alerts_channel_id,omitempty"`
 
 	// These fields are only sent in GUILD_CREATE
-	JoinedAt    string    `json:"joined_at,omitempty"`
-	Large       bool      `json:"large,omitempty"`
-	Unavailable bool      `json:"unavailable,omitempty"`
-	MemberCount int       `json:"member_count,omitempty"`
+	JoinedAt    string       `json:"joined_at,omitempty"`
+	Large       bool         `json:"large,omitempty"`
+	Unavailable bool         `json:"unavailable,omitempty"`
+	MemberCount int          `json:"member_count,omitempty"`
 	VoiceStates []VoiceState `json:"voice_states,omitempty"`
-	Members     []Member  `json:"members,omitempty"`
-	Channels    []Channel `json:"channels,omitempty"`
-	Threads     []Channel `json:"threads,omitempty"`
-	Presences   []Presence `json:"presences,omitempty"`
+	Members     []Member     `json:"members,omitempty"`
+	Channels    []Channel    `json:"channels,omitempty"`
+	Threads     []Channel    `json:"threads,omitempty"`
+	Presences   []Presence   `json:"presences,omitempty"`
 }
 
 // IconURL returns the URL for the guild's icon

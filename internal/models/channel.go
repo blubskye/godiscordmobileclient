@@ -1,60 +1,59 @@
 // Copyright (C) 2025 blubskye
-  //
-  // This program is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Affero General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-  //
-  // This program is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Affero General Public License for more details.
-  //
-  // You should have received a copy of the GNU Affero General Public License
-  // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  //
-  // Source code: https://github.com/blubskye/godiscordmobileclient
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Source code: https://github.com/blubskye/godiscordmobileclient
 
-  
 package models
 
 // Channel represents a Discord channel
 type Channel struct {
-	ID                            string                 `json:"id"`
-	Type                          ChannelType            `json:"type"`
-	GuildID                       string                 `json:"guild_id,omitempty"`
-	Position                      int                    `json:"position,omitempty"`
-	PermissionOverwrites          []PermissionOverwrite  `json:"permission_overwrites,omitempty"`
-	Name                          string                 `json:"name,omitempty"`
-	Topic                         string                 `json:"topic,omitempty"`
-	NSFW                          bool                   `json:"nsfw,omitempty"`
-	LastMessageID                 string                 `json:"last_message_id,omitempty"`
-	Bitrate                       int                    `json:"bitrate,omitempty"`
-	UserLimit                     int                    `json:"user_limit,omitempty"`
-	RateLimitPerUser              int                    `json:"rate_limit_per_user,omitempty"`
-	Recipients                    []User                 `json:"recipients,omitempty"`
-	Icon                          string                 `json:"icon,omitempty"`
-	OwnerID                       string                 `json:"owner_id,omitempty"`
-	ApplicationID                 string                 `json:"application_id,omitempty"`
-	Managed                       bool                   `json:"managed,omitempty"`
-	ParentID                      string                 `json:"parent_id,omitempty"`
-	LastPinTimestamp              string                 `json:"last_pin_timestamp,omitempty"`
-	RTCRegion                     string                 `json:"rtc_region,omitempty"`
-	VideoQualityMode              int                    `json:"video_quality_mode,omitempty"`
-	MessageCount                  int                    `json:"message_count,omitempty"`
-	MemberCount                   int                    `json:"member_count,omitempty"`
-	ThreadMetadata                *ThreadMetadata        `json:"thread_metadata,omitempty"`
-	Member                        *ThreadMember          `json:"member,omitempty"`
-	DefaultAutoArchiveDuration    int                    `json:"default_auto_archive_duration,omitempty"`
-	Permissions                   string                 `json:"permissions,omitempty"`
-	Flags                         int                    `json:"flags,omitempty"`
-	TotalMessageSent              int                    `json:"total_message_sent,omitempty"`
-	AvailableTags                 []ForumTag             `json:"available_tags,omitempty"`
-	AppliedTags                   []string               `json:"applied_tags,omitempty"`
-	DefaultReactionEmoji          *DefaultReaction       `json:"default_reaction_emoji,omitempty"`
-	DefaultThreadRateLimitPerUser int                    `json:"default_thread_rate_limit_per_user,omitempty"`
-	DefaultSortOrder              int                    `json:"default_sort_order,omitempty"`
-	DefaultForumLayout            int                    `json:"default_forum_layout,omitempty"`
+	ID                            string                `json:"id"`
+	Type                          ChannelType           `json:"type"`
+	GuildID                       string                `json:"guild_id,omitempty"`
+	Position                      int                   `json:"position,omitempty"`
+	PermissionOverwrites          []PermissionOverwrite `json:"permission_overwrites,omitempty"`
+	Name                          string                `json:"name,omitempty"`
+	Topic                         string                `json:"topic,omitempty"`
+	NSFW                          bool                  `json:"nsfw,omitempty"`
+	LastMessageID                 string                `json:"last_message_id,omitempty"`
+	Bitrate                       int                   `json:"bitrate,omitempty"`
+	UserLimit                     int                   `json:"user_limit,omitempty"`
+	RateLimitPerUser              int                   `json:"rate_limit_per_user,omitempty"`
+	Recipients                    []User                `json:"recipients,omitempty"`
+	Icon                          string                `json:"icon,omitempty"`
+	OwnerID                       string                `json:"owner_id,omitempty"`
+	ApplicationID                 string                `json:"application_id,omitempty"`
+	Managed                       bool                  `json:"managed,omitempty"`
+	ParentID                      string                `json:"parent_id,omitempty"`
+	LastPinTimestamp              string                `json:"last_pin_timestamp,omitempty"`
+	RTCRegion                     string                `json:"rtc_region,omitempty"`
+	VideoQualityMode              int                   `json:"video_quality_mode,omitempty"`
+	MessageCount                  int                   `json:"message_count,omitempty"`
+	MemberCount                   int                   `json:"member_count,omitempty"`
+	ThreadMetadata                *ThreadMetadata       `json:"thread_metadata,omitempty"`
+	Member                        *ThreadMember         `json:"member,omitempty"`
+	DefaultAutoArchiveDuration    int                   `json:"default_auto_archive_duration,omitempty"`
+	Permissions                   string                `json:"permissions,omitempty"`
+	Flags                         int                   `json:"flags,omitempty"`
+	TotalMessageSent              int                   `json:"total_message_sent,omitempty"`
+	AvailableTags                 []ForumTag            `json:"available_tags,omitempty"`
+	AppliedTags                   []string              `json:"applied_tags,omitempty"`
+	DefaultReactionEmoji          *DefaultReaction      `json:"default_reaction_emoji,omitempty"`
+	DefaultThreadRateLimitPerUser int                   `json:"default_thread_rate_limit_per_user,omitempty"`
+	DefaultSortOrder              int                   `json:"default_sort_order,omitempty"`
+	DefaultForumLayout            int                   `json:"default_forum_layout,omitempty"`
 }
 
 // ChannelType represents the type of channel

@@ -1,57 +1,56 @@
 // Copyright (C) 2025 blubskye
-  //
-  // This program is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Affero General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-  //
-  // This program is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Affero General Public License for more details.
-  //
-  // You should have received a copy of the GNU Affero General Public License
-  // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  //
-  // Source code: https://github.com/blubskye/godiscordmobileclient
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Source code: https://github.com/blubskye/godiscordmobileclient
 
-  
 package models
 
 import "time"
 
 // Message represents a Discord message
 type Message struct {
-	ID                   string             `json:"id"`
-	ChannelID            string             `json:"channel_id"`
-	Author               *User              `json:"author,omitempty"`
-	Content              string             `json:"content"`
-	Timestamp            time.Time          `json:"timestamp"`
-	EditedTimestamp      *time.Time         `json:"edited_timestamp,omitempty"`
-	TTS                  bool               `json:"tts"`
-	MentionEveryone      bool               `json:"mention_everyone"`
-	Mentions             []User             `json:"mentions"`
-	MentionRoles         []string           `json:"mention_roles"`
-	MentionChannels      []ChannelMention   `json:"mention_channels,omitempty"`
-	Attachments          []Attachment       `json:"attachments"`
-	Embeds               []Embed            `json:"embeds"`
-	Reactions            []Reaction         `json:"reactions,omitempty"`
-	Nonce                interface{}        `json:"nonce,omitempty"` // string or int
-	Pinned               bool               `json:"pinned"`
-	WebhookID            string             `json:"webhook_id,omitempty"`
-	Type                 MessageType        `json:"type"`
-	Activity             *MessageActivity   `json:"activity,omitempty"`
-	Application          *Application       `json:"application,omitempty"`
-	ApplicationID        string             `json:"application_id,omitempty"`
-	MessageReference     *MessageReference  `json:"message_reference,omitempty"`
-	Flags                int                `json:"flags,omitempty"`
-	ReferencedMessage    *Message           `json:"referenced_message,omitempty"`
+	ID                   string              `json:"id"`
+	ChannelID            string              `json:"channel_id"`
+	Author               *User               `json:"author,omitempty"`
+	Content              string              `json:"content"`
+	Timestamp            time.Time           `json:"timestamp"`
+	EditedTimestamp      *time.Time          `json:"edited_timestamp,omitempty"`
+	TTS                  bool                `json:"tts"`
+	MentionEveryone      bool                `json:"mention_everyone"`
+	Mentions             []User              `json:"mentions"`
+	MentionRoles         []string            `json:"mention_roles"`
+	MentionChannels      []ChannelMention    `json:"mention_channels,omitempty"`
+	Attachments          []Attachment        `json:"attachments"`
+	Embeds               []Embed             `json:"embeds"`
+	Reactions            []Reaction          `json:"reactions,omitempty"`
+	Nonce                interface{}         `json:"nonce,omitempty"` // string or int
+	Pinned               bool                `json:"pinned"`
+	WebhookID            string              `json:"webhook_id,omitempty"`
+	Type                 MessageType         `json:"type"`
+	Activity             *MessageActivity    `json:"activity,omitempty"`
+	Application          *Application        `json:"application,omitempty"`
+	ApplicationID        string              `json:"application_id,omitempty"`
+	MessageReference     *MessageReference   `json:"message_reference,omitempty"`
+	Flags                int                 `json:"flags,omitempty"`
+	ReferencedMessage    *Message            `json:"referenced_message,omitempty"`
 	Interaction          *MessageInteraction `json:"interaction,omitempty"`
-	Thread               *Channel           `json:"thread,omitempty"`
-	Components           []Component        `json:"components,omitempty"`
-	StickerItems         []StickerItem      `json:"sticker_items,omitempty"`
-	Position             int                `json:"position,omitempty"`
-	RoleSubscriptionData *RoleSubscription  `json:"role_subscription_data,omitempty"`
+	Thread               *Channel            `json:"thread,omitempty"`
+	Components           []Component         `json:"components,omitempty"`
+	StickerItems         []StickerItem       `json:"sticker_items,omitempty"`
+	Position             int                 `json:"position,omitempty"`
+	RoleSubscriptionData *RoleSubscription   `json:"role_subscription_data,omitempty"`
 
 	// Only for MESSAGE_CREATE event
 	GuildID string  `json:"guild_id,omitempty"`
@@ -207,12 +206,12 @@ type EmbedField struct {
 
 // Reaction represents a message reaction
 type Reaction struct {
-	Count        int           `json:"count"`
-	CountDetails *CountDetails `json:"count_details,omitempty"`
-	Me           bool          `json:"me"`
-	MeBurst      bool          `json:"me_burst"`
+	Count        int            `json:"count"`
+	CountDetails *CountDetails  `json:"count_details,omitempty"`
+	Me           bool           `json:"me"`
+	MeBurst      bool           `json:"me_burst"`
 	Emoji        *ReactionEmoji `json:"emoji"`
-	BurstColors  []string      `json:"burst_colors,omitempty"`
+	BurstColors  []string       `json:"burst_colors,omitempty"`
 }
 
 type CountDetails struct {
@@ -260,30 +259,30 @@ type MessageInteraction struct {
 
 // Component for buttons/selects
 type Component struct {
-	Type        int         `json:"type"`
-	CustomID    string      `json:"custom_id,omitempty"`
-	Disabled    bool        `json:"disabled,omitempty"`
-	Style       int         `json:"style,omitempty"`
-	Label       string      `json:"label,omitempty"`
+	Type        int            `json:"type"`
+	CustomID    string         `json:"custom_id,omitempty"`
+	Disabled    bool           `json:"disabled,omitempty"`
+	Style       int            `json:"style,omitempty"`
+	Label       string         `json:"label,omitempty"`
 	Emoji       *ReactionEmoji `json:"emoji,omitempty"`
-	URL         string      `json:"url,omitempty"`
+	URL         string         `json:"url,omitempty"`
 	Options     []SelectOption `json:"options,omitempty"`
-	Placeholder string      `json:"placeholder,omitempty"`
-	MinValues   int         `json:"min_values,omitempty"`
-	MaxValues   int         `json:"max_values,omitempty"`
-	Components  []Component `json:"components,omitempty"`
-	MinLength   int         `json:"min_length,omitempty"`
-	MaxLength   int         `json:"max_length,omitempty"`
-	Required    bool        `json:"required,omitempty"`
-	Value       string      `json:"value,omitempty"`
+	Placeholder string         `json:"placeholder,omitempty"`
+	MinValues   int            `json:"min_values,omitempty"`
+	MaxValues   int            `json:"max_values,omitempty"`
+	Components  []Component    `json:"components,omitempty"`
+	MinLength   int            `json:"min_length,omitempty"`
+	MaxLength   int            `json:"max_length,omitempty"`
+	Required    bool           `json:"required,omitempty"`
+	Value       string         `json:"value,omitempty"`
 }
 
 type SelectOption struct {
-	Label       string        `json:"label"`
-	Value       string        `json:"value"`
-	Description string        `json:"description,omitempty"`
+	Label       string         `json:"label"`
+	Value       string         `json:"value"`
+	Description string         `json:"description,omitempty"`
 	Emoji       *ReactionEmoji `json:"emoji,omitempty"`
-	Default     bool          `json:"default,omitempty"`
+	Default     bool           `json:"default,omitempty"`
 }
 
 // StickerItem is a partial sticker in messages

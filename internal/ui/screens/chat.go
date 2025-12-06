@@ -31,14 +31,13 @@ import (
 
 	"github.com/blubskye/godiscordmobileclient/internal/api"
 	"github.com/blubskye/godiscordmobileclient/internal/models"
-	"github.com/blubskye/godiscordmobileclient/internal/state"
 	"github.com/blubskye/godiscordmobileclient/internal/ui/theme"
 )
 
 // ChatScreen displays messages for a channel
 type ChatScreen struct {
 	theme     *theme.Theme
-	cache     *state.Cache
+	cache     CacheInterface
 	apiClient *api.Client
 	onBack    func()
 
@@ -51,7 +50,7 @@ type ChatScreen struct {
 }
 
 // NewChatScreen creates a new chat screen
-func NewChatScreen(theme *theme.Theme, cache *state.Cache, apiClient *api.Client, onBack func()) *ChatScreen {
+func NewChatScreen(theme *theme.Theme, cache CacheInterface, apiClient *api.Client, onBack func()) *ChatScreen {
 	return &ChatScreen{
 		theme:     theme,
 		cache:     cache,
