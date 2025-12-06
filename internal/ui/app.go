@@ -19,13 +19,13 @@ package ui
 
 import (
 	"context"
-	"log"
 
 	"gioui.org/app"
 	"gioui.org/layout"
 	"gioui.org/op"
 
 	"github.com/blubskye/godiscordmobileclient/internal/api"
+	"github.com/blubskye/godiscordmobileclient/internal/debug"
 	"github.com/blubskye/godiscordmobileclient/internal/gateway"
 	"github.com/blubskye/godiscordmobileclient/internal/models"
 	"github.com/blubskye/godiscordmobileclient/internal/state"
@@ -33,6 +33,8 @@ import (
 	"github.com/blubskye/godiscordmobileclient/internal/ui/screens"
 	"github.com/blubskye/godiscordmobileclient/internal/ui/theme"
 )
+
+var log = debug.NewLogger("ui")
 
 // Screen represents different app screens
 type Screen int
@@ -79,13 +81,25 @@ func NewApp(w *app.Window) *App {
 	// Load storage config and create hybrid cache
 	config, err := storage.LoadConfig("")
 	if err != nil {
-		log.Printf("Failed to load config, using defaults: %v", err)
+		log.Warn("Failed to load config, using defaults: %v", err)
 		config = storage.DefaultConfig()
 	}
 
+	// Initialize debug logging from config
+	debug.SetupFromConfig(&debug.DebugConfig{
+		Enabled:     config.DebugEnabled,
+		Level:       debug.Level(config.DebugLevel),
+		StackTraces: config.DebugStackTraces,
+		LogToFile:   config.DebugLogToFile,
+		LogFile:     config.DebugLogFile,
+		DataDir:     config.DataDir,
+	})
+
+	log.Info("Starting Discord Mobile client")
+
 	cache, err := storage.NewHybridCache(config)
 	if err != nil {
-		log.Printf("Failed to create hybrid cache, falling back to in-memory: %v", err)
+		log.Warn("Failed to create hybrid cache, falling back to in-memory: %v", err)
 		// Fall back to in-memory cache if hybrid fails
 		cache = nil
 	}
@@ -150,9 +164,10 @@ func (a *App) Run() error {
 			// Close cache if it supports closing (HybridCache does)
 			if closer, ok := a.cache.(interface{ Close() error }); ok {
 				if err := closer.Close(); err != nil {
-					log.Printf("Error closing cache: %v", err)
+					log.Error("Error closing cache: %v", err)
 				}
 			}
+			log.Info("Application shutting down")
 			return e.Err
 
 		case app.FrameEvent:
@@ -186,13 +201,14 @@ func (a *App) Layout(gtx layout.Context) layout.Dimensions {
 
 // onLogin handles successful login
 func (a *App) onLogin(token string) {
+	log.Debug("Login successful, connecting to gateway")
 	a.api.SetToken(token)
 	a.gateway.SetToken(token)
 
 	// Connect to gateway
 	go func() {
 		if err := a.gateway.Connect(a.ctx); err != nil {
-			log.Printf("Gateway connection failed: %v", err)
+			log.Error("Gateway connection failed: %v", err)
 			return
 		}
 	}()
@@ -210,6 +226,7 @@ func (a *App) onGuildSelect(guildID string) {
 
 // onChannelSelect handles channel selection
 func (a *App) onChannelSelect(channelID string) {
+	log.Debug("Channel selected: %s", channelID)
 	a.currentChannelID = channelID
 	a.chatScreen.SetChannel(channelID)
 
@@ -217,9 +234,10 @@ func (a *App) onChannelSelect(channelID string) {
 	go func() {
 		messages, err := a.api.GetMessages(a.ctx, channelID, &api.GetMessagesParams{Limit: 50})
 		if err != nil {
-			log.Printf("Failed to load messages: %v", err)
+			log.Error("Failed to load messages: %v", err)
 			return
 		}
+		log.Debug("Loaded %d messages for channel %s", len(messages), channelID)
 		// Convert to pointers and add to cache
 		msgPtrs := make([]*models.Message, len(messages))
 		for i := range messages {

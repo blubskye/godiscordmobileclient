@@ -27,7 +27,11 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/blubskye/godiscordmobileclient/internal/debug"
 )
+
+var log = debug.NewLogger("api")
 
 const (
 	BaseURL    = "https://discord.com/api/v10"
@@ -82,11 +86,14 @@ func (c *Client) RequestWithBucket(ctx context.Context, method, path, bucket str
 }
 
 func (c *Client) doRequest(ctx context.Context, method, path string, body interface{}, bucketKey string) ([]byte, error) {
+	log.Debug("%s %s", method, path)
+
 	// Check global rate limit
 	c.mu.Lock()
 	if time.Now().Before(c.globalReset) {
 		wait := time.Until(c.globalReset)
 		c.mu.Unlock()
+		log.Warn("global rate limit hit, waiting %v", wait)
 		select {
 		case <-time.After(wait):
 		case <-ctx.Done():
@@ -102,6 +109,7 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 	if b.remaining == 0 && time.Now().Before(b.reset) {
 		wait := time.Until(b.reset)
 		b.mu.Unlock()
+		log.Warn("bucket rate limit hit for %s, waiting %v", bucketKey, wait)
 		select {
 		case <-time.After(wait):
 		case <-ctx.Done():
@@ -116,14 +124,15 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 	if body != nil {
 		data, err := json.Marshal(body)
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshal body: %w", err)
+			return nil, debug.WrapError(err, "failed to marshal body")
 		}
 		bodyReader = bytes.NewReader(data)
+		log.Trace("request body: %s", string(data))
 	}
 
 	req, err := http.NewRequestWithContext(ctx, method, BaseURL+path, bodyReader)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, debug.WrapError(err, "failed to create request")
 	}
 
 	// Set headers
@@ -138,11 +147,15 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 	}
 
 	// Make request
+	start := time.Now()
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		log.Error("request failed: %v", err)
+		return nil, debug.WrapError(err, "request failed")
 	}
 	defer resp.Body.Close()
+
+	log.Debug("%s %s -> %d (%v)", method, path, resp.StatusCode, time.Since(start))
 
 	// Update rate limits from headers
 	c.updateRateLimits(resp, b)
@@ -150,12 +163,16 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 	// Read response
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response: %w", err)
+		return nil, debug.WrapError(err, "failed to read response")
 	}
+
+	log.Trace("response body: %d bytes", len(respBody))
 
 	// Handle errors
 	if resp.StatusCode >= 400 {
-		return nil, c.handleError(resp.StatusCode, respBody)
+		apiErr := c.handleError(resp.StatusCode, respBody)
+		log.Error("API error: %v", apiErr)
+		return nil, apiErr
 	}
 
 	return respBody, nil

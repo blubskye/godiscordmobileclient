@@ -34,6 +34,18 @@ const (
 	CacheLimitManual
 )
 
+// DebugLevel represents the logging verbosity level
+type DebugLevel int
+
+const (
+	DebugLevelOff DebugLevel = iota
+	DebugLevelError
+	DebugLevelWarn
+	DebugLevelInfo
+	DebugLevelDebug
+	DebugLevelTrace
+)
+
 // Config holds storage configuration
 type Config struct {
 	// Mode determines how limits are calculated
@@ -58,6 +70,13 @@ type Config struct {
 	CleanupIntervalMinutes int  `json:"cleanup_interval_minutes"` // How often to run cleanup
 	CleanupOnLowMemory     bool `json:"cleanup_on_low_memory"`    // Cleanup when memory is low
 	VacuumOnCleanup        bool `json:"vacuum_on_cleanup"`        // VACUUM database on cleanup
+
+	// Debug settings
+	DebugEnabled     bool       `json:"debug_enabled"`      // Enable debug mode
+	DebugLevel       DebugLevel `json:"debug_level"`        // Logging verbosity (0=off, 5=trace)
+	DebugStackTraces bool       `json:"debug_stack_traces"` // Include stack traces on errors
+	DebugLogToFile   bool       `json:"debug_log_to_file"`  // Write logs to file
+	DebugLogFile     string     `json:"debug_log_file"`     // Log file path (empty = auto)
 
 	// Data directory
 	DataDir string `json:"data_dir"`
@@ -86,6 +105,13 @@ func DefaultConfig() *Config {
 		CleanupIntervalMinutes: 30,
 		CleanupOnLowMemory:     true,
 		VacuumOnCleanup:        false, // Can be slow
+
+		// Debug (off by default)
+		DebugEnabled:     false,
+		DebugLevel:       DebugLevelInfo,
+		DebugStackTraces: false,
+		DebugLogToFile:   false,
+		DebugLogFile:     "",
 
 		DataDir: defaultDataDir(),
 	}

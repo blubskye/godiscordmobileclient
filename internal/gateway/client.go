@@ -22,12 +22,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
 	"nhooyr.io/websocket"
+
+	"github.com/blubskye/godiscordmobileclient/internal/debug"
 )
+
+var log = debug.NewLogger("gateway")
 
 const (
 	GatewayURL = "wss://gateway.discord.gg/?v=10&encoding=json"
@@ -192,17 +195,19 @@ func (c *Client) readLoop(ctx context.Context) {
 		_, msg, err := c.conn.Read(ctx)
 		if err != nil {
 			if websocket.CloseStatus(err) != -1 {
-				log.Printf("gateway closed: %v", err)
+				log.Warn("gateway closed: %v", err)
 			} else {
-				log.Printf("gateway read error: %v", err)
+				log.Error("gateway read error: %v", err)
 			}
 			c.handleDisconnect(ctx)
 			return
 		}
 
+		log.Trace("received message: %d bytes", len(msg))
+
 		var payload GatewayPayload
 		if err := json.Unmarshal(msg, &payload); err != nil {
-			log.Printf("failed to unmarshal gateway payload: %v", err)
+			log.Error("failed to unmarshal gateway payload: %v", err)
 			continue
 		}
 
@@ -219,33 +224,38 @@ func (c *Client) handlePayload(ctx context.Context, payload *GatewayPayload) {
 		c.sequenceMu.Unlock()
 	}
 
+	log.Debug("received opcode %d, event: %s", payload.Op, payload.Type)
+
 	switch payload.Op {
 	case OpcodeHello:
 		var hello HelloData
 		if err := json.Unmarshal(payload.Data, &hello); err != nil {
-			log.Printf("failed to unmarshal hello: %v", err)
+			log.Error("failed to unmarshal hello: %v", err)
 			return
 		}
+		log.Info("connected to gateway, heartbeat interval: %dms", hello.HeartbeatInterval)
 		c.heartbeatInterval = time.Duration(hello.HeartbeatInterval) * time.Millisecond
 		go c.heartbeatLoop(ctx)
 		c.identify(ctx)
 
 	case OpcodeHeartbeat:
-		// Server requested immediate heartbeat
+		log.Debug("server requested immediate heartbeat")
 		c.sendHeartbeat(ctx)
 
 	case OpcodeHeartbeatACK:
+		log.Trace("heartbeat ACK received")
 		c.heartbeatMu.Lock()
 		c.lastHeartbeatAck = time.Now()
 		c.heartbeatMu.Unlock()
 
 	case OpcodeReconnect:
-		log.Println("gateway requested reconnect")
+		log.Warn("gateway requested reconnect")
 		c.handleDisconnect(ctx)
 
 	case OpcodeInvalidSession:
 		var resumable bool
 		json.Unmarshal(payload.Data, &resumable)
+		log.Warn("invalid session, resumable: %v", resumable)
 		if !resumable {
 			c.sessionID = ""
 			c.sequence = 0
@@ -255,6 +265,7 @@ func (c *Client) handlePayload(ctx context.Context, payload *GatewayPayload) {
 		c.handleDisconnect(ctx)
 
 	case OpcodeDispatch:
+		log.Debug("dispatch event: %s", payload.Type)
 		c.handleEvent(payload.Type, payload.Data)
 	}
 }
@@ -267,8 +278,11 @@ func (c *Client) handleEvent(eventType string, data json.RawMessage) {
 		if err := json.Unmarshal(data, &ready); err == nil {
 			c.sessionID = ready.SessionID
 			c.resumeGatewayURL = ready.ResumeGatewayURL
+			log.Info("session established, session_id: %s", c.sessionID)
 		}
 	}
+
+	log.Trace("dispatching event %s to %d handlers", eventType, len(c.handlers))
 
 	// Call registered handlers
 	for _, handler := range c.handlers {
@@ -280,10 +294,12 @@ func (c *Client) handleEvent(eventType string, data json.RawMessage) {
 func (c *Client) identify(ctx context.Context) {
 	// Check if we can resume
 	if c.sessionID != "" && c.sequence > 0 {
+		log.Debug("resuming session %s at sequence %d", c.sessionID, c.sequence)
 		c.resume(ctx)
 		return
 	}
 
+	log.Debug("sending IDENTIFY")
 	identify := IdentifyData{
 		Token: c.token,
 		Properties: IdentifyProperties{
@@ -297,7 +313,7 @@ func (c *Client) identify(ctx context.Context) {
 	}
 
 	if err := c.Send(ctx, OpcodeIdentify, identify); err != nil {
-		log.Printf("failed to send identify: %v", err)
+		log.Error("failed to send identify: %v", err)
 	}
 }
 
@@ -307,6 +323,8 @@ func (c *Client) resume(ctx context.Context) {
 	seq := c.sequence
 	c.sequenceMu.Unlock()
 
+	log.Info("sending RESUME for session %s at sequence %d", c.sessionID, seq)
+
 	resume := ResumeData{
 		Token:     c.token,
 		SessionID: c.sessionID,
@@ -314,12 +332,13 @@ func (c *Client) resume(ctx context.Context) {
 	}
 
 	if err := c.Send(ctx, OpcodeResume, resume); err != nil {
-		log.Printf("failed to send resume: %v", err)
+		log.Error("failed to send resume: %v", err)
 	}
 }
 
 // heartbeatLoop sends heartbeats at the specified interval
 func (c *Client) heartbeatLoop(ctx context.Context) {
+	log.Debug("starting heartbeat loop with interval %v", c.heartbeatInterval)
 	ticker := time.NewTicker(c.heartbeatInterval)
 	defer ticker.Stop()
 
@@ -329,6 +348,7 @@ func (c *Client) heartbeatLoop(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
+			log.Debug("heartbeat loop stopped: context cancelled")
 			return
 		case <-ticker.C:
 			c.heartbeatMu.Lock()
@@ -337,7 +357,7 @@ func (c *Client) heartbeatLoop(ctx context.Context) {
 
 			// Check if we received ACK for last heartbeat
 			if !lastAck.IsZero() && time.Since(lastAck) > c.heartbeatInterval*2 {
-				log.Println("heartbeat ACK timeout, reconnecting")
+				log.Warn("heartbeat ACK timeout (last ACK: %v ago), reconnecting", time.Since(lastAck))
 				c.handleDisconnect(ctx)
 				return
 			}
@@ -353,18 +373,22 @@ func (c *Client) sendHeartbeat(ctx context.Context) {
 	seq := c.sequence
 	c.sequenceMu.Unlock()
 
+	log.Trace("sending heartbeat, sequence: %d", seq)
+
 	var data interface{}
 	if seq > 0 {
 		data = seq
 	}
 
 	if err := c.Send(ctx, OpcodeHeartbeat, data); err != nil {
-		log.Printf("failed to send heartbeat: %v", err)
+		log.Error("failed to send heartbeat: %v", err)
 	}
 }
 
 // handleDisconnect handles disconnection and reconnection
 func (c *Client) handleDisconnect(ctx context.Context) {
+	log.Warn("handling disconnect, preparing to reconnect")
+
 	c.connMu.Lock()
 	c.connected = false
 	if c.conn != nil {
@@ -379,13 +403,14 @@ func (c *Client) handleDisconnect(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
+			log.Info("reconnect cancelled: context done")
 			return
 		case <-time.After(backoff):
 		}
 
-		log.Printf("attempting to reconnect...")
+		log.Info("attempting to reconnect (backoff: %v)...", backoff)
 		if err := c.Connect(ctx); err != nil {
-			log.Printf("reconnect failed: %v", err)
+			log.Error("reconnect failed: %v", err)
 			backoff *= 2
 			if backoff > maxBackoff {
 				backoff = maxBackoff
@@ -393,7 +418,7 @@ func (c *Client) handleDisconnect(ctx context.Context) {
 			continue
 		}
 
-		log.Println("reconnected successfully")
+		log.Info("reconnected successfully")
 		return
 	}
 }
